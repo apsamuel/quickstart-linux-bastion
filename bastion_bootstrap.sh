@@ -35,6 +35,7 @@ function setup_environment_variables() {
   LOCAL_IP_ADDRESS=$(curl -sq 169.254.169.254/latest/meta-data/network/interfaces/macs/${ETH0_MAC}/local-ipv4s/)
 
   CWG=$(grep CLOUDWATCHGROUP ${_userdata_file} | sed 's/CLOUDWATCHGROUP=//g')
+  CWG="$(cat /tmp/vpc_name)-bastion-cwg"
 
   # LOGGING CONFIGURATION
   BASTION_MNT="/var/log/bastion"
