@@ -101,6 +101,8 @@ function harden_ssh_security () {
     # Allow ec2-user only to access this folder and its content
     #chmod -R 770 /var/log/bastion
     #setfacl -Rdm other:0 /var/log/bastion
+    touch /var/log/bastion/bastion.log
+    chmod 777 /var/log/bastion/bastion.log
     chmod -R 777 /var/log/bastion
     # Make OpenSSH execute a custom script on logins
     echo -e "\nForceCommand /usr/bin/bastion/shell" >> /etc/ssh/sshd_config
