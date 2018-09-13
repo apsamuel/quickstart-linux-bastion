@@ -101,7 +101,7 @@ function harden_ssh_security () {
     # Allow ec2-user only to access this folder and its content
     #chmod -R 770 /var/log/bastion
     #setfacl -Rdm other:0 /var/log/bastion
-
+    chmod -R 777 /var/log/bastion
     # Make OpenSSH execute a custom script on logins
     echo -e "\nForceCommand /usr/bin/bastion/shell" >> /etc/ssh/sshd_config
 
@@ -116,10 +116,17 @@ export Allow_SCP="scp"
 if [[ -z $SSH_ORIGINAL_COMMAND ]] || [[ $SSH_ORIGINAL_COMMAND =~ ^$Allow_SSH ]] || [[ $SSH_ORIGINAL_COMMAND =~ ^$Allow_SCP ]]; then
 #Allow ssh to instance and log connection
     if [ -z "$SSH_ORIGINAL_COMMAND" ]; then
-        /bin/bash
+        DATE_TIME_WHOAMI="`whoami`:`date "+%Y-%m-%d %H:%M:%S"`"
+        LOG_ORIGINAL_COMMAND=`echo "$DATE_TIME_WHOAMI:interactive"`
+        echo "$LOG_ORIGINAL_COMMAND"  |tee -a "${bastion_mnt}/${bastion_log}"
+	/bin/bash
         exit 0
     else
+        DATE_TIME_WHOAMI="`whoami`:`date "+%Y-%m-%d %H:%M:%S"`"
+        LOG_ORIGINAL_COMMAND=`echo "$DATE_TIME_WHOAMI:$SSH_ORIGINAL_COMMAND"`
+        echo "$LOG_ORIGINAL_COMMAND"  |tee -a "${bastion_mnt}/${bastion_log}"
         $SSH_ORIGINAL_COMMAND
+	exit 1
     fi
 
 log_file=`echo "$log_shadow_file_location"`
@@ -330,7 +337,7 @@ logging_config_file = /var/awslogs/etc/awslogs.conf
 
 [/var/log/bastion]
 datetime_format = %Y-%m-%d %H:%M:%S
-file = /var/log/messages
+file = /var/log/bastion/bastion.log
 buffer_duration = 5000
 log_stream_name = {instance_id}
 initial_position = start_of_file
@@ -364,7 +371,7 @@ EOF
         yum install -y awslogs
         export TMPREGION=`cat /etc/awslogs/awscli.conf | grep region`
         sed -i.back "s/${TMPREGION}/region = ${REGION}/g" /etc/awslogs/awscli.conf
-        echo "file = ${BASTION_LOGFILE_SHADOW}" >> /tmp/groupname.txt
+        #echo "file = ${BASTION_LOGFILE_SHADOW}" >> /tmp/groupname.txt
         echo "log_group_name = ${CWG}" >> /tmp/groupname.txt
 
         cat <<EOF >> ~/cloudwatchlog.conf
