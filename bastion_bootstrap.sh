@@ -319,7 +319,7 @@ EOF
     # Install CloudWatch Log service on Centos Linux
     centos=`cat /etc/os-release | grep VERSION_ID | tr -d \VERSION_ID=\"`
     if [ "${centos}" == "7" ]; then
-        echo "file = ${BASTION_LOGFILE_SHADOW}" >> /tmp/groupname.txt
+        #echo "file = ${BASTION_LOGFILE_SHADOW}" >> /tmp/groupname.txt
         echo "log_group_name = ${CWG}" >> /tmp/groupname.txt
 
         cat <<EOF >> ~/cloudwatchlog.conf
