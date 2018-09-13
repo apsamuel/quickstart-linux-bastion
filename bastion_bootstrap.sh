@@ -46,6 +46,7 @@ function setup_environment_variables() {
   BASTION_LOGFILE_SHADOW="${BASTION_MNT}/.${BASTION_LOG}"
   touch ${BASTION_LOGFILE}
   ln ${BASTION_LOGFILE} ${BASTION_LOGFILE_SHADOW}
+  chmod 777 "${BASTION_MNT}/${BASTION_LOG}"
   mkdir -p /usr/bin/bastion
   touch /tmp/messages
   chmod 770 /tmp/messages
@@ -103,6 +104,7 @@ function harden_ssh_security () {
     #setfacl -Rdm other:0 /var/log/bastion
     touch /var/log/bastion/bastion.log
     chmod 777 /var/log/bastion/bastion.log
+    chown centos:centos /var/log/bastion
     chmod -R 777 /var/log/bastion
     # Make OpenSSH execute a custom script on logins
     echo -e "\nForceCommand /usr/bin/bastion/shell" >> /etc/ssh/sshd_config
