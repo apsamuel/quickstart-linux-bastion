@@ -121,16 +121,17 @@ if [[ -z $SSH_ORIGINAL_COMMAND ]] || [[ $SSH_ORIGINAL_COMMAND =~ ^$Allow_SSH ]] 
 #Allow ssh to instance and log connection
     if [ -z "$SSH_ORIGINAL_COMMAND" ]; then
         DATE_TIME_WHOAMI="`whoami`:`date "+%Y-%m-%d %H:%M:%S"`"
-        LOG_ORIGINAL_COMMAND=`echo "$DATE_TIME_WHOAMI:interactive"`
+        LOG_ORIGINAL_COMMAND=`echo "$DATE_TIME_WHOAMI:$SSH_ORIGINAL_COMMAND:interactive"`
         echo "$LOG_ORIGINAL_COMMAND"  | sudo tee -a "${bastion_mnt}/${bastion_log}"
-	/bin/bash
+	      #/bin/bash
+        script -a /var/log/bastion/sessions.log
         exit 0
     else
         DATE_TIME_WHOAMI="`whoami`:`date "+%Y-%m-%d %H:%M:%S"`"
-        LOG_ORIGINAL_COMMAND=`echo "$DATE_TIME_WHOAMI:$SSH_ORIGINAL_COMMAND"`
+        LOG_ORIGINAL_COMMAND=`echo "$DATE_TIME_WHOAMI:$SSH_ORIGINAL_COMMAND:noninteractive"`
         echo "$LOG_ORIGINAL_COMMAND"  |sudo tee -a "${bastion_mnt}/${bastion_log}"
         $SSH_ORIGINAL_COMMAND
-	exit 1
+	      exit 1
     fi
 
 log_file=`echo "$log_shadow_file_location"`
@@ -338,6 +339,14 @@ EOF
 state_file = /var/awslogs/state/agent-state
 use_gzip_http_content_encoding = true
 logging_config_file = /var/awslogs/etc/awslogs.conf
+
+[/var/log/bastion/sessions]
+atetime_format = %Y-%m-%d %H:%M:%S
+file = /var/log/bastion/session.log
+buffer_duration = 5000
+log_stream_name = {instance_id}
+initial_position = start_of_file
+log_group_name = ${CWG}
 
 [/var/log/bastion]
 datetime_format = %Y-%m-%d %H:%M:%S
