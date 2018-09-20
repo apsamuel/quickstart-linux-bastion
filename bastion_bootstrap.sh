@@ -124,7 +124,7 @@ if [[ -z $SSH_ORIGINAL_COMMAND ]] || [[ $SSH_ORIGINAL_COMMAND =~ ^$Allow_SSH ]] 
         LOG_ORIGINAL_COMMAND=`echo "$DATE_TIME_WHOAMI:$SSH_ORIGINAL_COMMAND:interactive"`
         echo "$LOG_ORIGINAL_COMMAND"  | sudo tee -a "${bastion_mnt}/${bastion_log}"
 	      #/bin/bash
-        script -a /var/log/bastion/sessions.log
+        script -a /var/log/bastion/session.log
         exit 0
     else
         DATE_TIME_WHOAMI="`whoami`:`date "+%Y-%m-%d %H:%M:%S"`"
